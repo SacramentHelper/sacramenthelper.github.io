@@ -1,3 +1,5 @@
+// SVG Help https://www.sarasoueidan.com/blog/structuring-grouping-referencing-in-svg/
+
 const personSize = 20;
 const aisle = personSize * 2;
 const borderSpace = 10;
@@ -44,9 +46,7 @@ function styleAttrs(num, num2){
     //Two colors - https://stackoverflow.com/questions/13069446/simple-fill-pattern-in-svg-diagonal-hatching
 }
 
-const colors = ['green', 'blue', 'red', 'purple', 'orange', 'cyan']
-
-
+const colors = ['green', 'blue', 'red', 'purple', 'orange', 'cyan', 'lightblue', 'cadetblue'];
 const passers = 6;
 
 const ChapelSvg = {
@@ -63,7 +63,6 @@ const ChapelSvg = {
             style:`fill:${colors[2]};`
         }),
 
-
         //Congregation
         m('rect.border', {x: x.start.left, y: y.start.congregation, width: w.side, height: h.congregation,
             style:`fill:${colors[2]};`
@@ -71,7 +70,6 @@ const ChapelSvg = {
 
         m('pattern', { id:"diagonalHatch", patternUnits:"userSpaceOnUse", width:"4", height:"4"},
             m('path', { d:"M-1,1 l2,-2 M0,4 l4,-4 M3,5 l2,-2", style:"stroke:black; stroke-width:1"})),
-
 
         // <rect width="50" height="50" x="25" y="25" fill="child" stroke="grey">
         //     <pattern viewBox="0 0 100 100" width="20%" height="20%">
@@ -91,16 +89,13 @@ const ChapelSvg = {
             style:"fill:none;"
         }),
 
-        
-
-
         // Right side Boarder
         m('rect.border', {x: x.start.right, y: y.start.congregation, width: w.side, height: h.congregation,
             style: "fill:none;"
         }),
         // Right side fill
         m('rect', {x: x.start.right, y: y.start.congregation + h.passers, width: w.side, height: h.congregation - h.passers,
-            style:`fill:${colors[3]};`
+            style:`fill:${colors[3]}; `
         }),
 
         //Overflow
@@ -122,4 +117,46 @@ const ChapelSvg = {
     ])
 };
 
+
+
+// https://www.sarasoueidan.com/blog/structuring-grouping-referencing-in-svg/
+const Section = {
+    oninit: vnode => {
+        vnode.attrs.left_front = 1;
+        vnode.attrs.left_back = 3;
+        vnode.attrs.right_front = 5;
+        vnode.attrs.right_back = 4;
+    },
+    view: vnode => m('', [
+        // JSON.stringify(vnode.attrs),
+        m('svg', {width: 100, height: 100, viewBox: `0 0 100 100` }, [
+            vnode.attrs.left_front && m('text', {
+                x: 20, y: 20,
+                fill: colors[vnode.attrs.left_front],
+            }, vnode.attrs.left_front),
+
+            vnode.attrs.left_back && m('text', {
+                x: 20, y: 80,
+                fill: colors[vnode.attrs.left_back],
+            }, vnode.attrs.left_back),
+
+            vnode.attrs.right_front && m('text', {
+                x: 80, y: 20,
+                fill: colors[vnode.attrs.right_front],
+            }, vnode.attrs.right_front),
+
+            vnode.attrs.right_back && m('text', {
+                x: 80, y: 80,
+                fill: colors[vnode.attrs.right_back],
+            }, vnode.attrs.right_back),
+
+            m('rect.border', {x: 40, y: 20, width: 40, height: 40,
+                style: "fill:green;"
+            }),
+        ])
+    ])
+};
+
+
+// export default Section;
 export default ChapelSvg;

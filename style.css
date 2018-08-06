@@ -1,10 +1,10 @@
 rect {
-    opacity:0.5;
+    /* opacity:0.5; */
 }
 
 rect.border {
     stroke:black;
-    stroke-width:10;
+    stroke-width:3;
 }
 
 .stripe-1 {

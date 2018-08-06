@@ -13,10 +13,8 @@ const Passing= {
                 // m('.column', [
                 //     'Options'
                 // ]),
-                m('.column', [
-                    "Image",
-                    m(ChapelSvg)
-                ])
+                // m('.column', m('.has-text-centered', m(ChapelSvg)) )
+                m('.column', m(ChapelSvg))
             ])
         ]),
         m('section', [
