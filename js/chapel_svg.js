@@ -1,162 +1,129 @@
 // SVG Help https://www.sarasoueidan.com/blog/structuring-grouping-referencing-in-svg/
+// https://www.sarasoueidan.com/blog/structuring-grouping-referencing-in-svg/
+// Two colors - https://stackoverflow.com/questions/13069446/simple-fill-pattern-in-svg-diagonal-hatching
 
 const personSize = 20;
 const aisle = personSize * 2;
-const borderSpace = 10;
 
-const w = {
-    side: personSize * 4,
-    center: personSize * 12,
-    overflow: personSize * 9,
-};
-
-const h = {
-    stand: personSize * 3,
-    congregation: personSize * 10,
-    overflow: personSize * 6,
-    passers: personSize * 2
-};
-
-const x = {
-    start: {
-        left: borderSpace,
-        center: borderSpace + aisle + w.side,
-        right: borderSpace + aisle * 2 + w.side + w.center,
-        overflow: {
-            left: borderSpace + aisle,
-            right: borderSpace + aisle * 2 + w.overflow,
-        }
-    }
-};
-
-const y = {
-    start: {
-        stand: borderSpace,
-        congregation: borderSpace + h.stand + aisle,
-        overflow: borderSpace + h.stand + h.congregation + aisle * 2,
-    }
-};
 
 const viewbox = {
-    x: borderSpace * 2 + aisle * 2 + w.side * 2 + w.center,
-    y: borderSpace * 2 + aisle * 2 + h.stand + h.congregation + h.overflow,
+    x: 2000, y: 2000,
+
+    // x: borderSpace * 2 + aisle * 2 + w.side * 2 + w.center,
+    // y: borderSpace * 2 + aisle * 2 + h.stand + h.congregation + h.overflow,
 };
 
-function styleAttrs(num, num2){
-    //Two colors - https://stackoverflow.com/questions/13069446/simple-fill-pattern-in-svg-diagonal-hatching
-}
+const selectorSkew = 10;
+const showSelectors = false;
 
-const colors = ['green', 'blue', 'red', 'purple', 'orange', 'cyan', 'lightblue', 'cadetblue'];
-const passers = 6;
+/** rowThreeSections
+ * top, rows, sections: {seats, passers}
+*/
+const rowSections = {
+    view: vnode => [
+        vnode.attrs.sections.map((section, i) => {
+            let left = personSize;
+            if (vnode.attrs.sections.length % 2 == 0) { left += personSize; }
+
+            for (let j = i -1; j >= 0; j--){
+                let prev = vnode.attrs.sections[j]
+                left += aisle + prev.seats * personSize
+            }
+
+            return [
+                m(`rect.border`,
+                    {
+                        y: vnode.attrs.top,
+                        x: left,
+                        height: vnode.attrs.rows * personSize,
+                        width: section.seats * personSize,
+                    }
+                ),
+                showSelectors && [
+                    m('text.selector', {
+                        y: vnode.attrs.top + personSize,
+                        x: left - selectorSkew,
+                    }, 'a'),
+                    m('text.selector', {
+                        y: vnode.attrs.top + personSize,
+                        x: left + selectorSkew + section.seats * personSize,
+                    }, 'b'),
+                    m('text.selector', {
+                        y: vnode.attrs.top + vnode.attrs.rows * personSize,
+                        x: left - selectorSkew,
+                    }, 'c'),
+                    m('text.selector', {
+                        y: vnode.attrs.top + vnode.attrs.rows * personSize,
+                        x: left + selectorSkew + section.seats * personSize,
+                    }, 'd'),
+                ],
+            ];
+        }),
+    ]
+};
+
+
+let temp =  [
+    {
+        rows: 2,
+        sections: [
+            {seats: 4},
+            {seats: 10},
+            {seats: 4},
+        ],
+    },
+    {
+        rows: 8,
+        sections: [
+            {seats: 4},
+            {seats: 10},
+            {seats: 4},
+        ],
+    },
+    {
+        rows: 4,
+        sections: [
+            {seats: 9},
+            {seats: 9},
+        ],
+    },
+];
+
+
+const passers = 8;
+// TODO figure this out
+const passX = 364;
+const passY = 120;
+
 
 const ChapelSvg = {
-    // view: vnode => m('svg', {}, [
-    view: vnode => m('svg', {width: viewbox.x, height: viewbox.y, viewBox: `0 0 ${viewbox.x} ${viewbox.y}` }, [
-        //Stand
-        m('rect.border', {x: x.start.left, y: y.start.stand, width: w.side, height: h.stand,
-            style:`fill:${colors[2]};`
-        }),
-        m('rect.border', {x: x.start.center, y: y.start.stand, width: w.center, height: h.stand,
-            style:`fill:${colors[2]};`
-        }),
-        m('rect.border', {x: x.start.right, y: y.start.stand, width: w.side, height: h.stand,
-            style:`fill:${colors[2]};`
+    view: vnode => m('svg', {width: viewbox.x, height: viewbox.y, viewBox: `0 0 ${viewbox.x} ${viewbox.y}` },
+
+       temp.map((row, i) => {
+            console.log(i, row);
+
+            let top = personSize
+            for (let j = i -1; j >= 0; j--){
+                let prev = temp[j]
+                top += aisle + prev.rows * personSize
+            }
+
+            return m(rowSections, {
+                top: top,
+                rows: row.rows,
+                sections: row.sections,
+            })
         }),
 
-        //Congregation
-        m('rect.border', {x: x.start.left, y: y.start.congregation, width: w.side, height: h.congregation,
-            style:`fill:${colors[2]};`
-        }),
-
-        m('pattern', { id:"diagonalHatch", patternUnits:"userSpaceOnUse", width:"4", height:"4"},
-            m('path', { d:"M-1,1 l2,-2 M0,4 l4,-4 M3,5 l2,-2", style:"stroke:black; stroke-width:1"})),
-
-        // <rect width="50" height="50" x="25" y="25" fill="child" stroke="grey">
-        //     <pattern viewBox="0 0 100 100" width="20%" height="20%">
-        //         <path d="M0,0 h40 L100,60 v40 z m 0,60 v40 h40 z" fill="red" />
-        //     </pattern>
-        //     <pattern viewBox="0 0 100 100" width="20%" height="20%">
-        //         <path d="M0,0 h40 L100,60 v40 z m 0,60 v40 h40 z" fill="grey" />
-        //     </pattern>
-        // </rect>
-
-        // m('rect.border', {x: x.start.center, y: y.start.congregation, width: w.center, height: h.congregation,
-        //     style:"fill:url(#diagonalHatch);"
-        // }),
-
-        m('rect.border.stripe-1', {x: x.start.center, y: y.start.congregation, width: w.center, height: h.congregation,
-            // style:"fill:url(#diagonalHatch);"
-            style:"fill:none;"
-        }),
-
-        // Right side Boarder
-        m('rect.border', {x: x.start.right, y: y.start.congregation, width: w.side, height: h.congregation,
-            style: "fill:none;"
-        }),
-        // Right side fill
-        m('rect', {x: x.start.right, y: y.start.congregation + h.passers, width: w.side, height: h.congregation - h.passers,
-            style:`fill:${colors[3]}; `
-        }),
-
-        //Overflow
-        m('rect.border', {x: x.start.overflow.left, y: y.start.overflow, width: w.overflow, height: h.overflow,
-            style:`fill:${colors[4]};`
-        }),
-        m('rect.border', {x: x.start.overflow.right, y: y.start.overflow, width: w.overflow, height: h.overflow,
-            style:`fill:${colors[5]};`
-        }),
 
         Array(passers).fill(0).map((_, i) =>
-            m('text', {
-                x: x.start.right + borderSpace + personSize * (i % (passers/2)),
-                y: y.start.congregation + borderSpace * 2 + personSize * Math.floor(i / (passers/2)),
-                fill: colors[i],
+            m(`text.passer-${i}`, {
+                x: passX + personSize + personSize * (i % (passers/2)),
+                y: passY + personSize * Math.floor(i / (passers/2)),
                 opacity:0.5,
             }, i + 1)
         ),
-    ])
+    )
 };
 
-
-
-// https://www.sarasoueidan.com/blog/structuring-grouping-referencing-in-svg/
-const Section = {
-    oninit: vnode => {
-        vnode.attrs.left_front = 1;
-        vnode.attrs.left_back = 3;
-        vnode.attrs.right_front = 5;
-        vnode.attrs.right_back = 4;
-    },
-    view: vnode => m('', [
-        // JSON.stringify(vnode.attrs),
-        m('svg', {width: 100, height: 100, viewBox: `0 0 100 100` }, [
-            vnode.attrs.left_front && m('text', {
-                x: 20, y: 20,
-                fill: colors[vnode.attrs.left_front],
-            }, vnode.attrs.left_front),
-
-            vnode.attrs.left_back && m('text', {
-                x: 20, y: 80,
-                fill: colors[vnode.attrs.left_back],
-            }, vnode.attrs.left_back),
-
-            vnode.attrs.right_front && m('text', {
-                x: 80, y: 20,
-                fill: colors[vnode.attrs.right_front],
-            }, vnode.attrs.right_front),
-
-            vnode.attrs.right_back && m('text', {
-                x: 80, y: 80,
-                fill: colors[vnode.attrs.right_back],
-            }, vnode.attrs.right_back),
-
-            m('rect.border', {x: 40, y: 20, width: 40, height: 40,
-                style: "fill:green;"
-            }),
-        ])
-    ])
-};
-
-
-// export default Section;
 export default ChapelSvg;
