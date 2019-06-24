@@ -31,4 +31,13 @@ rect.border {
 .passer-11 { fill: slategray; }
 .passer-12 { fill: slateblue; }
 
+svg {
+  background-color: greenyellow;
+}
+
 svg text { font-weight: bold; }
+
+.flex {
+  display: flex;
+}
+
