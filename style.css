@@ -36,8 +36,3 @@ svg {
 }
 
 svg text { font-weight: bold; }
-
-.flex {
-  display: flex;
-}
-

@@ -154,9 +154,9 @@ const ChapelSvg = {
 };
 
 const Arrangment = {
-    view: _ => m('.flex',
-        m(Configuration),
-        m(ChapelSvg),
+    view: _ => m('.columns',
+        m('.column', m(ChapelSvg)),
+        m('.column', m(Configuration)),
     )
 };
 
